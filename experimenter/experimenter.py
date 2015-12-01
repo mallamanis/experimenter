@@ -1,5 +1,7 @@
+import os
 import time
 import json
+import logging
 from git import Repo, TagReference
 
 class Experimenter:
@@ -16,7 +18,9 @@ class Experimenter:
         :type tag_prefix: str
         '''
         self.__experiment_name = "exp_" + name + str(int(time.time()))
-        self.repository =  Repo(directory, search_parent_directories=True)
+        self.repository = Repo(directory, search_parent_directories=True)
+        if len(self.repository.untracked_files) > 0:
+            logging.warn("Untracked files will not be recorded: %s", self.repository.untracked_files)
         self.__tag_name = tag_prefix + self.__experiment_name
         self.__tag_object = self.__start_experiment(parameters)
 
@@ -43,6 +47,15 @@ class Experimenter:
         assert self.__tag_name not in [t.name for t in self.repository.tags]
         return TagReference.create(self.repository, self.__tag_name, message=json.dumps(data))
 
+    def __get_files_to_be_added(self):
+        """
+        :return: the files that have been modified and can be added
+        """
+        for root, dirs, files in os.walk(self.repository.working_dir):
+            for f in files:
+                relative_path = os.path.join(root, f)[len(self.repository.working_dir):]
+                if relative_path not in self.repository.untracked_files:
+                    yield relative_path
 
     def __start_experiment(self, parameters):
         """
@@ -52,13 +65,17 @@ class Experimenter:
         :return: the tag representing this experiment
         :rtype: TagReference
         """
-        #TODO: Switch branch (record old one)
-        # TODO: Do a commit
+        current_commit = self.repository.head.commit
+        started_state_is_dirty = self.repository.is_dirty()
+
+        if started_state_is_dirty:
+            self.repository.index.add([p for p in self.__get_files_to_be_added()])
+            self.repository.index.commit("Temporary commit for experiment")
 
         data = {"parameters": parameters, "started": time.time(), "results": {}}
         tag_object = self.__tag_repo(data)
 
-        # TODO: Go back to original branch
-        # TODO: Restore changes (as if they weren't committed)
+        if started_state_is_dirty:
+            self.repository.head.reset(current_commit, working_tree=False, index=True)
 
         return tag_object

@@ -6,7 +6,7 @@ Use Cases
 -----
   * It is the case that you might make some changes in your machine learning code, not necessarily worth committing, and
 spawn a process to run an experiment that uses these changes. However, by the time the experiment has finished you don't
-know what changes you were testing.
+know what changes you were testing (presumably because you made more changes in the meanwhile).
   * You need a distributed way of collecting all the experiments (parameters and results), making sure that they have 
 been run on the exact same version of the code.
 
