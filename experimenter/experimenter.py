@@ -37,6 +37,12 @@ class Experimenter:
         TagReference.create(self.__repository, self.__tag_name, message=json.dumps(data),
                             ref=self.__tag_object.tag.object, force=True)
 
+    def cancel_experiment(self):
+        """
+        Cancel an experiment by removing the tag that has already been created.
+        """
+        self.__repository.delete_tag(self.__tag_name)
+
     def experiment_tag(self):
         return self.__tag_name
 
