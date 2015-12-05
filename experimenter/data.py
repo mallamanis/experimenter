@@ -2,6 +2,8 @@ from git import Repo
 from git.repo.fun import name_to_object
 import json
 
+__all__ = ['ExperimentData']
+
 class ExperimentData:
 
     def __init__(self, directory=".", tag_prefix="experiments/"):
@@ -19,11 +21,14 @@ class ExperimentData:
         results = []
         for tag in self.__repository.tags:
             data = json.loads(tag.tag.message)
-            if "results" not in data  and must_contain_results:
+            if "results" not in data and must_contain_results:
                 continue
             if commit is not None and tag.tag.object.hexsha == name_to_object(self.__repository, commit):
                 continue
             results.append(data)
+
+    def delete(self, experiment_name):
+        raise NotImplemented()
 
 if __name__ == "__main__":
     #TODO:

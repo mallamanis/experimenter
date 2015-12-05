@@ -4,6 +4,8 @@ import json
 import logging
 from git import Repo, TagReference
 
+__all__ = ['Experimenter']
+
 class Experimenter:
     def __init__(self, name, parameters, directory=".", tag_prefix="experiments/"):
         '''
