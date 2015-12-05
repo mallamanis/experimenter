@@ -52,8 +52,10 @@ class Experimenter:
         :return: the files that have been modified and can be added
         """
         for root, dirs, files in os.walk(self.__repository.working_dir):
+            if root.startswith(os.path.join(self.__repository.working_dir, ".git")):
+                continue
             for f in files:
-                relative_path = os.path.join(root, f)[len(self.__repository.working_dir):]
+                relative_path = os.path.join(root, f)[len(self.__repository.working_dir)+1:]
                 if relative_path not in self.__repository.untracked_files:
                     yield relative_path
 
