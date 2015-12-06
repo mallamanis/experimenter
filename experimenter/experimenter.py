@@ -23,6 +23,8 @@ class Experimenter:
         self.__repository = Repo(directory, search_parent_directories=True)
         if len(self.__repository.untracked_files) > 0:
             logging.warn("Untracked files will not be recorded: %s", self.__repository.untracked_files)
+        if tag_prefix[-1] != '/':
+            tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
         self.__tag_object = self.__start_experiment(parameters)
 

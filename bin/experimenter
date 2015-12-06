@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+from experimenter import ExperimentData
+import argparse
+
+parser = argparse.ArgumentParser(description='Manipulate experiment information')
+parser.add_argument('--list', "-l", default=False,
+                    help='List the results of all experiments')
+parser.add_argument('--gather', "-g",
+                    help="Gather the results into a JSON. Output JSON to stdout unless an output destination"
+                         "is defined")
+parser.add_argument("--output", "-o", type=str,
+                    help="Output results into the given file. Can be combined only with --gather (-g)")
+
+parser.add_argument("--commit", "-c", help="Filter only experiments that are relevant this commit.", default="")
+
+parser.add_argument("--directory",
+                    help="The git directory where the experiments are stored. Defaults to the current directory",
+                    default=".")
+parser.add_argument("--tag-prefix", help="The prefix that experiment-relevant tags appear. Default is `experiments/`",
+                    default="experiments/")
+
+args = parser.parse_args()
+
+exp = ExperimentData(directory=args.directory, tag_prefix=args.tag_prefix)
