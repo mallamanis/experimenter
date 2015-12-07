@@ -57,8 +57,8 @@ class TestExperimenter(unittest.TestCase):
         # Test with data
         d = ExperimentData(directory=self.__test_repo)
         self.assertEqual(len(d.experiment_data()), 1)
-        self.assertEqual(d.experiment_data().values()[0], data)
-        self.assertEqual(d.experiment_data(repo.tags[0].object.hexsha).values()[0], data)
+        self.assertEqual(d.experiment_data()[experiment.name()], data)
+        self.assertEqual(d.experiment_data(repo.tags[0].tag.object.hexsha)[experiment.name()], data)
 
         # Create second experiment
         experiment2 = ExperimentLogger("unittest2", {"testParams": True}, directory=self.__test_repo)
@@ -71,13 +71,13 @@ class TestExperimenter(unittest.TestCase):
         self.assertEqual(len(repo.tags), 2)
         self.assertEqual(len(d.experiment_data(must_contain_results=True)), 2)
         self.assertEqual(len(d.experiment_data()), 2)
-        self.assertEqual(d.experiment_data(repo.tags[0].object.hexsha)[experiment.name()], data)
-        self.assertEqual(len(d.experiment_data(repo.tags[0].object.hexsha)), 2)
+        self.assertEqual(d.experiment_data(repo.tags[0].tag.object.hexsha)[experiment.name()], data)
+        self.assertEqual(len(d.experiment_data(repo.tags[0].tag.object.hexsha)), 2)
 
         result = d.delete(experiment2.name())
         self.assertTrue(result, experiment2.name())
         self.assertEqual(len(repo.tags), 1)
-        self.assertEqual(d.experiment_data(repo.tags[0].object.hexsha)[experiment.name()], data)
+        self.assertEqual(d.experiment_data(repo.tags[0].tag.object.hexsha)[experiment.name()], data)
 
         self.assertTrue(d.delete(experiment.name()))
 
