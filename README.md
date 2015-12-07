@@ -9,11 +9,11 @@ Use Cases
 
 Usage
 -----
-Create an `Experiment` object, passing the parameters of the experiment. When the experiment is finished, call
+Create an `ExperimentRecorder` object, passing the parameters of the experiment. When the experiment is finished, call
 the `record_results()` method of that object, ie:
 
 ```python
-experiment_logger = Experiment(name="NameOfExperiment", parameters=parameters_dict)
+experiment_logger = ExperimentRecorder(name="NameOfExperiment", parameters=parameters_dict)
 ...
 experiment_logger.record_results(dict_of_results)
 ```
