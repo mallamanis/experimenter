@@ -1,12 +1,12 @@
 from setuptools import setup
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(name='experimenter',
       version='0.1',
-      description='Use git to record experiment results along with the appropriate version of the code.',
+      description='Use git to record experiment results (as git tags) keeping the exact code that was used.',
       url='http://github.com/mallamanis/experimenter',
       author='Miltos Allamanis',
       author_email='mallamanis@gmail.com',
