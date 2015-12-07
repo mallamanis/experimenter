@@ -23,5 +23,5 @@ Behind the scenes, a git tag will be created (committing any changes you may hav
  
 TODO
 ------
-   * A command line tool for parsing all experiments and outputing them into CSVs or another format
+   * A command line tool for starting/stopping experiments.
 
