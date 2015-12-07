@@ -29,15 +29,27 @@ class ExperimentRecorder:
         self.__tag_object = self.__start_experiment(parameters)
 
     def record_results(self, results):
-        '''
+        """
         Record the results of this experiment, by updating the tag.
         :param results: A dictionary containing the results of the experiment.
         :type results: dict
-        '''
+        """
         data = json.loads(self.__tag_object.tag.message)
         data["results"] = results
         TagReference.create(self.__repository, self.__tag_name, message=json.dumps(data),
                             ref=self.__tag_object.tag.object, force=True)
+
+    def record_results_and_push(self, results, remote_name='origin'):
+        """
+        Record the results of this experiment, by updating the tag and push to remote
+        :param results:  A dictionary containing the results of the experiment.
+        :type results: dict
+        :param remote_name: the name of the remote to push the tags (or None for the default)
+        :type remote_name: str
+        """
+        #self.record_results(results)
+        #self.__repository.remote(name=remote_name).push() #TODO: Create refspecs for tag
+        raise NotImplemented()
 
     def cancel_experiment(self):
         """
@@ -45,7 +57,7 @@ class ExperimentRecorder:
         """
         self.__repository.delete_tag(self.__tag_name)
 
-    def experiment_tag(self):
+    def name(self):
         return self.__tag_name
 
     def __tag_repo(self, data):
