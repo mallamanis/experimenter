@@ -4,9 +4,9 @@ import json
 import logging
 from git import Repo, TagReference
 
-__all__ = ['Experimenter']
+__all__ = ['ExperimentRecorder']
 
-class Experimenter:
+class ExperimentRecorder:
     def __init__(self, name, parameters, directory=".", tag_prefix="experiments/"):
         '''
         Start logging a new experiment.
@@ -15,7 +15,7 @@ class Experimenter:
         :param parameters: a dictionary with all the parameters of the experiment.
         :type parameters: dict
         :param directory: a string of the directory of the git repository, where the experiment will be logged.
-        :type directory: dict
+        :type directory: str
         :param tag_prefix: the prefix of the "folder" where the experiment-related tags will be placed
         :type tag_prefix: str
         '''
@@ -84,7 +84,7 @@ class Experimenter:
             self.__repository.index.add([p for p in self.__get_files_to_be_added()])
             self.__repository.index.commit("Temporary commit for experiment " + self.__experiment_name)
 
-        data = {"parameters": parameters, "started": time.time(), "results": {}}
+        data = {"parameters": parameters, "started": time.time()}
         tag_object = self.__tag_repo(data)
 
         if started_state_is_dirty:

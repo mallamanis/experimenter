@@ -1,3 +1,3 @@
 from data import *
-from experimenter import *
-__all__ = ["Experimenter", "ExperimentData"]
+from experimentrecorder import *
+__all__ = ["ExperimentRecorder", "ExperimentData"]

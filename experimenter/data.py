@@ -20,7 +20,7 @@ class ExperimentData:
         """
         results = []
         for tag in self.__repository.tags:
-            if not tag.startswith(self.__tag_prefix):
+            if not tag.name.startswith(self.__tag_prefix):
                 continue
             data = json.loads(tag.tag.message)
             if "results" not in data and must_contain_results:
@@ -38,7 +38,10 @@ class ExperimentData:
         :rtype bool
         :return if deleting succeeded
         """
-        target_tag = self.__tag_prefix + experiment_name
+        if not experiment_name.startswith(self.__tag_prefix):
+            target_tag = self.__tag_prefix + experiment_name
+        else:
+            target_tag = experiment_name
         if target_tag not in [t.name for t in self.__repository.tags]:
             return False
         self.__repository.delete_tag(target_tag)
