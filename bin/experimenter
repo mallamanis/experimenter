@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='Retrieve experiment information')
 parser.add_argument("--json", "-j", type=str,
                     help="Output results into the given file as JSON.")
 
-parser.add_argument("--commit", "-c", help="Filter only experiments that are relevant this commit SHA.", default="")
+parser.add_argument("--commit", "-c", help="Filter only experiments that are relevant this commit SHA.", default=None)
 
 parser.add_argument("--directory",
                     help="The git directory where the experiments are stored. Defaults to the current directory",
@@ -25,17 +25,17 @@ args = parser.parse_args()
 
 exp = ExperimentData(directory=args.directory, tag_prefix=args.tag_prefix)
 
-if args.commit == "":
+if args.commit is None:
     experiments = exp.experiment_data(must_contain_results=args.must_contain_results)
 else:
     experiments = exp.experiment_data(commit=args.commit, must_contain_results=args.must_contain_results)
 
 if args.json is None:
     for name, data in experiments.items():
-        print "Experiment %s (started %s)" % (name, time.localtime(data["started"]))
+        print "Experiment %s (started %s)" % (name, time.asctime(time.localtime(data["started"])))
         print "Parameters: %s" % json.dumps(data["parameters"], indent=2, sort_keys=True)
         if "results" in data:
             print "Results: %s" % json.dumps(data["results"], indent=2, sort_keys=True)
 else:
-    with open(args.output) as f:
+    with open(args.json, 'w') as f:
         json.dump(experiments, f)

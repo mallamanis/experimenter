@@ -26,7 +26,7 @@ class ExperimentData:
             data = json.loads(tag.tag.message)
             if "results" not in data and must_contain_results:
                 continue
-            if commit is not None and tag.tag.object.hexsha == name_to_object(self.__repository, commit):
+            if commit is not None and tag.tag.object.hexsha != name_to_object(self.__repository, commit).hexsha:
                 continue
             results[tag.name] = data
         return results
