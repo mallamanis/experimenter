@@ -4,9 +4,9 @@ import json
 import logging
 from git import Repo, TagReference
 
-__all__ = ['ExperimentRecorder']
+__all__ = ['ExperimentLogger']
 
-class ExperimentRecorder:
+class ExperimentLogger:
     def __init__(self, name, parameters, directory=".", tag_prefix="experiments/"):
         '''
         Start logging a new experiment.

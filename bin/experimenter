@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from experimentrecorder import ExperimentData
+from experimentlogger import ExperimentData
 import argparse
 
 parser = argparse.ArgumentParser(description='Manipulate experiment information')

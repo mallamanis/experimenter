@@ -3,7 +3,7 @@ import shutil
 import os
 import json
 from git import Repo
-from experimenter import ExperimentRecorder, ExperimentData
+from experimenter import ExperimentLogger, ExperimentData
 
 
 class TestExperimenter(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestExperimenter(unittest.TestCase):
         self.assertEqual(len(repo.tags), 0)
 
         # Create an experiment
-        experiment = ExperimentRecorder("unittest", {"testParams": True}, directory=self.__test_repo)
+        experiment = ExperimentLogger("unittest", {"testParams": True}, directory=self.__test_repo)
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags[0].name, experiment.name())
 
@@ -61,7 +61,7 @@ class TestExperimenter(unittest.TestCase):
         self.assertEqual(d.experiment_results(repo.tags[0].object.hexsha)[0], data)
 
         # Create second experiment
-        experiment2 = ExperimentRecorder("unittest2", {"testParams": True}, directory=self.__test_repo)
+        experiment2 = ExperimentLogger("unittest2", {"testParams": True}, directory=self.__test_repo)
         self.assertEqual(len(repo.tags), 2)
         self.assertEqual(repo.tags[1].name, experiment2.name())
         self.assertEqual(len(d.experiment_results()), 2)
@@ -91,7 +91,7 @@ class TestExperimenter(unittest.TestCase):
             f.write(self.__original_content_test1)
             f.write("Updated!")
 
-        experiment = ExperimentRecorder("unittest", {"testParams": True}, directory=self.__test_repo)
+        experiment = ExperimentLogger("unittest", {"testParams": True}, directory=self.__test_repo)
         self.assertNotEqual(repo.tags[0].object.hexsha, repo.head.object.hexsha)
         self.assertEqual(repo.tags[0].commit.parents[0], repo.head.object)
 
