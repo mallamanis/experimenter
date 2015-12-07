@@ -19,9 +19,15 @@ experiment_logger.record_results(dict_of_results)
 ```
 
 Behind the scenes, a git tag will be created (committing any changes you may have in the working tree, into a different branch). The tag will have a name of the form `exp_NameOfExperiment_timestamp` and in the message it will have a JSON representation of the parameters and the results (when/if recorded). The working state of the current branch will seemingly remain unaffected.
- 
+
+There is a command-line tool that helps with retrieving tests. In the git folder, run the command
+```
+> experimenter -c SHAofCodeState
+```
+to retrieve all the experiments that happened with the give code version. If `-c` is not provided then all experiments will be shown. If `-s` is provided only experiments that have results will be shown. The strict command is off by default. Use `--help` for more information.
  
 TODO
 ------
    * A command line tool for starting/stopping experiments.
+   * Auto-push tags method in `ExperimentLogger`
 
