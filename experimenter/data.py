@@ -10,15 +10,16 @@ class ExperimentData:
         self.__repository = Repo(directory, search_parent_directories=True)
         self.__tag_prefix = tag_prefix
 
-    def experiment_results(self, commit=None, must_contain_results=False):
+    def experiment_data(self, commit=None, must_contain_results=False):
         """
         :param commit: the commit that all the experiments should have happened or None to include all
         :type commit: str
         :param must_contain_results: include only tags that contain results
         :type must_contain_results: bool
         :return: all the experiment data
+        :rtype: dict
         """
-        results = []
+        results = {}
         for tag in self.__repository.tags:
             if not tag.name.startswith(self.__tag_prefix):
                 continue
@@ -27,7 +28,7 @@ class ExperimentData:
                 continue
             if commit is not None and tag.tag.object.hexsha == name_to_object(self.__repository, commit):
                 continue
-            results.append(data)
+            results[tag.name] = data
         return results
 
     def delete(self, experiment_name):

@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
-from experimentlogger import ExperimentData
+from experimenter import ExperimentData
+
 import argparse
+import json
+import time
 
-parser = argparse.ArgumentParser(description='Manipulate experiment information')
-parser.add_argument('--list', "-l", default=False,
-                    help='List the results of all experiments')
-parser.add_argument('--gather', "-g",
-                    help="Gather the results into a JSON. Output JSON to stdout unless an output destination"
-                         "is defined")
-parser.add_argument("--output", "-o", type=str,
-                    help="Output results into the given file. Can be combined only with --gather (-g)")
+parser = argparse.ArgumentParser(description='Retrieve experiment information')
+parser.add_argument("--json", "-j", type=str,
+                    help="Output results into the given file as JSON.")
 
-parser.add_argument("--commit", "-c", help="Filter only experiments that are relevant this commit.", default="")
+parser.add_argument("--commit", "-c", help="Filter only experiments that are relevant this commit SHA.", default="")
 
 parser.add_argument("--directory",
                     help="The git directory where the experiments are stored. Defaults to the current directory",
@@ -20,6 +18,24 @@ parser.add_argument("--directory",
 parser.add_argument("--tag-prefix", help="The prefix that experiment-relevant tags appear. Default is `experiments/`",
                     default="experiments/")
 
+parser.add_argument("--must-contain-results", "-s", action="store_true",
+                    help="If the experiments not containing results are ignored. Defaults to non-strict mode.")
+
 args = parser.parse_args()
 
 exp = ExperimentData(directory=args.directory, tag_prefix=args.tag_prefix)
+
+if args.commit == "":
+    experiments = exp.experiment_data(must_contain_results=args.must_contain_results)
+else:
+    experiments = exp.experiment_data(commit=args.commit, must_contain_results=args.must_contain_results)
+
+if args.json is None:
+    for name, data in experiments.items():
+        print "Experiment %s (started %s)" % (name, time.localtime(data["started"]))
+        print "Parameters: %s" % json.dumps(data["parameters"], indent=2, sort_keys=True)
+        if "results" in data:
+            print "Results: %s" % json.dumps(data["results"], indent=2, sort_keys=True)
+else:
+    with open(args.output) as f:
+        json.dump(experiments, f)
