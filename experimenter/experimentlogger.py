@@ -74,12 +74,13 @@ class ExperimentLogger:
         :return: the files that have been modified and can be added
         """
         for root, dirs, files in os.walk(self.__repository.working_dir):
-            if root.startswith(os.path.join(self.__repository.working_dir, ".git")):
-                continue
             for f in files:
                 relative_path = os.path.join(root, f)[len(self.__repository.working_dir)+1:]
-                if relative_path not in self.__repository.untracked_files:
+                try:
+                    self.__repository.head.commit.tree[relative_path] # will fail if not tracked
                     yield relative_path
+                except:
+                    pass
 
     def __start_experiment(self, parameters):
         """
