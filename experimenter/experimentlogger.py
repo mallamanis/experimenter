@@ -27,6 +27,7 @@ class ExperimentLogger:
             tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
         self.__tag_object = self.__start_experiment(parameters)
+        logging.info("Started experiment %s", self.__tag_name)
 
     def record_results(self, results):
         """
