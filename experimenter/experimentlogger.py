@@ -20,14 +20,24 @@ class ExperimentLogger:
         :type tag_prefix: str
         '''
         self.__experiment_name = "exp_" + name + str(int(time.time()))
+        self.__results_recorded = False
         self.__repository = Repo(directory, search_parent_directories=True)
         if len(self.__repository.untracked_files) > 0:
             logging.warn("Untracked files will not be recorded: %s", self.__repository.untracked_files)
         if tag_prefix[-1] != '/':
             tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
-        self.__tag_object = self.__start_experiment(parameters)
+        self.__parameters = parameters
+
+    def __enter__(self):
+        self.__tag_object = self.__start_experiment(self.__parameters)
         logging.info("Started experiment %s", self.__tag_name)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self.__results_recorded:
+            self.__repository.delete_tag(self.__tag_name)
+            logging.warn("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
 
     def record_results(self, results):
         """
@@ -39,6 +49,7 @@ class ExperimentLogger:
         data["results"] = results
         TagReference.create(self.__repository, self.__tag_name, message=json.dumps(data),
                             ref=self.__tag_object.tag.object, force=True)
+        self.__results_recorded = True
 
     def record_results_and_push(self, results, remote_name='origin'):
         """
@@ -51,12 +62,6 @@ class ExperimentLogger:
         #self.record_results(results)
         #self.__repository.remote(name=remote_name).push() #TODO: Create refspecs for tag
         raise NotImplemented()
-
-    def cancel_experiment(self):
-        """
-        Cancel an experiment by removing the tag that has already been created.
-        """
-        self.__repository.delete_tag(self.__tag_name)
 
     def name(self):
         return self.__tag_name
