@@ -1,6 +1,10 @@
 Experimenter
 =======
-Use git tags to log experiments and the exact code that was used to run those experiments.
+Use git tags to log experiments and the exact code that was used to run those experiments. To install use
+```
+pip install experimenter
+```
+All contributions are welcome.
 
 Use Cases
 -----
