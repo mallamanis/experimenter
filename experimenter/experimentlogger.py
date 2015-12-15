@@ -7,7 +7,7 @@ from git import Repo, TagReference
 __all__ = ['ExperimentLogger']
 
 class ExperimentLogger:
-    def __init__(self, name, parameters, directory=".", tag_prefix="experiments/"):
+    def __init__(self, name, parameters, directory=".", tag_prefix="experiments/", description=None):
         '''
         Start logging a new experiment.
         :param name: the name of the experiment
@@ -28,6 +28,7 @@ class ExperimentLogger:
             tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
         self.__parameters = parameters
+        self.__description = description
 
     def __enter__(self):
         self.__tag_object = self.__start_experiment(self.__parameters)
@@ -101,9 +102,13 @@ class ExperimentLogger:
 
         if started_state_is_dirty:
             self.__repository.index.add([p for p in self.__get_files_to_be_added()])
-            self.__repository.index.commit("Temporary commit for experiment " + self.__experiment_name)
+            commit_obj = self.__repository.index.commit("Temporary commit for experiment " + self.__experiment_name)
+            sha = commit_obj.hexsha
+        else:
+            sha = self.__repository.head.object.hexsha
 
-        data = {"parameters": parameters, "started": time.time()}
+        data = {"parameters": parameters, "started": time.time(), "description": self.__description,
+                "commit_sha": sha}
         tag_object = self.__tag_repo(data)
 
         if started_state_is_dirty:
