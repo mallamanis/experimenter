@@ -39,6 +39,7 @@ class ExperimentLogger:
         if not self.__results_recorded:
             self.__repository.delete_tag(self.__tag_name)
             logging.warn("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
+        logging.info("Experiment %s completed", self.__tag_name)
 
     def record_results(self, results):
         """
