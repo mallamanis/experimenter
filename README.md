@@ -1,4 +1,4 @@
-Experimenter
+Experimenter [![pypi](https://img.shields.io/pypi/v/experimenter.svg)](https://pypi.python.org/pypi/experimenter)
 =======
 Use git tags to log experiments and the exact code that was used to run those experiments. To install use
 ```
