@@ -1,10 +1,10 @@
 Experimenter [![pypi](https://img.shields.io/pypi/v/experimenter.svg)](https://pypi.python.org/pypi/experimenter)
 =======
-Use git tags to log experiments and the exact code that was used to run those experiments. To install use
+Use git tags to log experiments and the exact code that was used to run those experiments. The goal is to make every experiment completely reproducible. To install use
 ```
 pip install experimenter
 ```
-All contributions are welcome.
+All contributions are welcome. Experimenter was inspired by [Ali's](http://arkitus.com/patterns-for-research-in-machine-learning/) and [Charles'](http://www.theexclusive.org/2012/08/principles-of-research-code.html) blog posts.
 
 Use Cases
 -----
