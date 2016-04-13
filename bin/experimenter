@@ -5,6 +5,7 @@ from experimenter import ExperimentData
 import argparse
 import json
 import time
+import six
 
 parser = argparse.ArgumentParser(description='Retrieve experiment information')
 parser.add_argument("--json", "-j", type=str,
@@ -32,10 +33,10 @@ else:
 
 if args.json is None:
     for name, data in experiments.items():
-        print "Experiment %s (started %s)" % (name, time.asctime(time.localtime(data["started"])))
-        print "Parameters: %s" % json.dumps(data["parameters"], indent=2, sort_keys=True)
+        print("Experiment %s (started %s)" % (name, time.asctime(time.localtime(data["started"]))))
+        print("Parameters: %s" % json.dumps(data["parameters"], indent=2, sort_keys=True))
         if "results" in data:
-            print "Results: %s" % json.dumps(data["results"], indent=2, sort_keys=True)
+            print("Results: %s" % json.dumps(data["results"], indent=2, sort_keys=True))
 else:
     with open(args.json, 'w') as f:
         json.dump(experiments, f)

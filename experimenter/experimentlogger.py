@@ -23,7 +23,7 @@ class ExperimentLogger:
         self.__results_recorded = False
         self.__repository = Repo(directory, search_parent_directories=True)
         if len(self.__repository.untracked_files) > 0:
-            logging.warn("Untracked files will not be recorded: %s", self.__repository.untracked_files)
+            logging.warning("Untracked files will not be recorded: %s", self.__repository.untracked_files)
         if tag_prefix[-1] != '/':
             tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
@@ -38,7 +38,7 @@ class ExperimentLogger:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if not self.__results_recorded:
             self.__repository.delete_tag(self.__tag_name)
-            logging.warn("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
+            logging.warning("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
         logging.info("Experiment %s completed", self.__tag_name)
 
     def record_results(self, results):
