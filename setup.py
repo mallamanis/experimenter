@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='experimenter',
-      version='0.1.4',
+      version='0.1.5',
       description='Use git to record experiment results (as git tags) keeping the exact code that was used.',
       keywords='experiment reproducibility git',
       url='http://github.com/mallamanis/experimenter',
