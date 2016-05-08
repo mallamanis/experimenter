@@ -65,7 +65,7 @@ class TestExperimenter(unittest.TestCase):
             with ExperimentLogger("unittest2", {"testParams": True}, directory=self.__test_repo) as experiment2:
                 exp2_name = experiment2.name()
                 self.assertEqual(len(repo.tags), 2)
-                self.assertEqual(repo.tags[1].name, exp2_name)
+                self.assertEqual(repo.tags[0].name, exp2_name)
                 self.assertEqual(len(d.experiment_data()), 2)
                 self.assertEqual(len(d.experiment_data(must_contain_results=True)), 1)
 

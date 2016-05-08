@@ -1,5 +1,6 @@
 import os
 import time
+import random
 import json
 import logging
 from git import Repo, TagReference
@@ -19,7 +20,8 @@ class ExperimentLogger:
         :param tag_prefix: the prefix of the "folder" where the experiment-related tags will be placed
         :type tag_prefix: str
         '''
-        self.__experiment_name = "exp_" + name + "@" + time.strftime("%Y.%m.%d--%Hh.%Mm.%Ss")+str(time.time() -int(time.time()))[1:]
+        # Add a random integer to avoid some collisions
+        self.__experiment_name = name + "@" + time.strftime("%Y.%m.%d--%Hh.%Mm.%Ss") + '.' + str(random.randint(0, 100))
         self.__results_recorded = False
         self.__repository_directory = directory
         if tag_prefix[-1] != '/':
