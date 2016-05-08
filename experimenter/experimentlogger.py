@@ -21,9 +21,7 @@ class ExperimentLogger:
         '''
         self.__experiment_name = "exp_" + name + str(int(time.time()))
         self.__results_recorded = False
-        self.__repository = Repo(directory, search_parent_directories=True)
-        if len(self.__repository.untracked_files) > 0:
-            logging.warning("Untracked files will not be recorded: %s", self.__repository.untracked_files)
+        self.__repository_directory = directory
         if tag_prefix[-1] != '/':
             tag_prefix += '/'
         self.__tag_name = tag_prefix + self.__experiment_name
@@ -31,13 +29,15 @@ class ExperimentLogger:
         self.__description = description
 
     def __enter__(self):
-        self.__tag_object = self.__start_experiment(self.__parameters)
+        self.__start_experiment(self.__parameters)
         logging.info("Started experiment %s", self.__tag_name)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        repository = Repo(self.__repository_directory, search_parent_directories=True)
+        print("exiting"+str((exc_type, exc_val, exc_tb)))
         if not self.__results_recorded:
-            self.__repository.delete_tag(self.__tag_name)
+            repository.delete_tag(self.__tag_name)
             logging.warning("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
         logging.info("Experiment %s completed", self.__tag_name)
 
@@ -47,10 +47,17 @@ class ExperimentLogger:
         :param results: A dictionary containing the results of the experiment.
         :type results: dict
         """
-        data = json.loads(self.__tag_object.tag.message)
+        repository = Repo(self.__repository_directory, search_parent_directories=True)
+        for tag in repository.tags:
+            if tag.name == self.__tag_name:
+                tag_object = tag
+                break
+        else:
+            raise Exception("Experiment tag has been deleted since experiment started")
+        data = json.loads(tag_object.tag.message)
         data["results"] = results
-        TagReference.create(self.__repository, self.__tag_name, message=json.dumps(data),
-                            ref=self.__tag_object.tag.object, force=True)
+        TagReference.create(repository, self.__tag_name, message=json.dumps(data),
+                            ref=tag_object.tag.object, force=True)
         self.__results_recorded = True
 
     def record_results_and_push(self, results, remote_name='origin'):
@@ -68,24 +75,24 @@ class ExperimentLogger:
     def name(self):
         return self.__tag_name
 
-    def __tag_repo(self, data):
+    def __tag_repo(self, data, repository):
         """
         Tag the current repository.
         :param data: a dictionary containing the data about the experiment
         :type data: dict
         """
-        assert self.__tag_name not in [t.name for t in self.__repository.tags]
-        return TagReference.create(self.__repository, self.__tag_name, message=json.dumps(data))
+        assert self.__tag_name not in [t.name for t in repository.tags]
+        return TagReference.create(repository, self.__tag_name, message=json.dumps(data))
 
-    def __get_files_to_be_added(self):
+    def __get_files_to_be_added(self, repository):
         """
         :return: the files that have been modified and can be added
         """
-        for root, dirs, files in os.walk(self.__repository.working_dir):
+        for root, dirs, files in os.walk(repository.working_dir):
             for f in files:
-                relative_path = os.path.join(root, f)[len(self.__repository.working_dir)+1:]
+                relative_path = os.path.join(root, f)[len(repository.working_dir) + 1:]
                 try:
-                    self.__repository.head.commit.tree[relative_path] # will fail if not tracked
+                    repository.head.commit.tree[relative_path] # will fail if not tracked
                     yield relative_path
                 except:
                     pass
@@ -98,21 +105,24 @@ class ExperimentLogger:
         :return: the tag representing this experiment
         :rtype: TagReference
         """
-        current_commit = self.__repository.head.commit
-        started_state_is_dirty = self.__repository.is_dirty()
+        repository = Repo(self.__repository_directory, search_parent_directories=True)
+        if len(repository.untracked_files) > 0:
+            logging.warning("Untracked files will not be recorded: %s", repository.untracked_files)
+        current_commit = repository.head.commit
+        started_state_is_dirty = repository.is_dirty()
 
         if started_state_is_dirty:
-            self.__repository.index.add([p for p in self.__get_files_to_be_added()])
-            commit_obj = self.__repository.index.commit("Temporary commit for experiment " + self.__experiment_name)
+            repository.index.add([p for p in self.__get_files_to_be_added(repository)])
+            commit_obj = repository.index.commit("Temporary commit for experiment " + self.__experiment_name)
             sha = commit_obj.hexsha
         else:
-            sha = self.__repository.head.object.hexsha
+            sha = repository.head.object.hexsha
 
         data = {"parameters": parameters, "started": time.time(), "description": self.__description,
                 "commit_sha": sha}
-        tag_object = self.__tag_repo(data)
+        tag_object = self.__tag_repo(data, repository)
 
         if started_state_is_dirty:
-            self.__repository.head.reset(current_commit, working_tree=False, index=True)
+            repository.head.reset(current_commit, working_tree=False, index=True)
 
         return tag_object
