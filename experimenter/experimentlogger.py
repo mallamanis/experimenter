@@ -19,7 +19,7 @@ class ExperimentLogger:
         :param tag_prefix: the prefix of the "folder" where the experiment-related tags will be placed
         :type tag_prefix: str
         '''
-        self.__experiment_name = "exp_" + name + str(int(time.time()))
+        self.__experiment_name = "exp_" + name + "@" + time.strftime("%Y.%m.%d--%Hh.%Mm.%Ss")+str(time.time() -int(time.time()))[1:]
         self.__results_recorded = False
         self.__repository_directory = directory
         if tag_prefix[-1] != '/':
@@ -33,9 +33,9 @@ class ExperimentLogger:
         logging.info("Started experiment %s", self.__tag_name)
         return self
 
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         repository = Repo(self.__repository_directory, search_parent_directories=True)
-        print("exiting"+str((exc_type, exc_val, exc_tb)))
         if not self.__results_recorded:
             repository.delete_tag(self.__tag_name)
             logging.warning("Experiment %s cancelled, since no results were recorded.", self.__tag_name)
